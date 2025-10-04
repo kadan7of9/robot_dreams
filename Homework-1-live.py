@@ -33,10 +33,12 @@ PATH = "datasets/crack_meter/CalibData-30kHz-0-12--.csv"
 
 # Load the Concrete dataset
 dataset = pd.read_csv(PATH, delimiter=';') # ; is used as column delimiter
+
 # Apply Scale_current function to current columns
 dataset["CurrentSet"] = dataset["CurrentSet"].apply(Scale_current)
 dataset["Current"] = dataset["Current"].apply(Scale_current)
 dataset["Voltage Drop"] = dataset["Voltage Drop"].apply(Scale_voltage)
+
 # Rename columns for easier access
 dataset.rename(
     columns={
@@ -53,7 +55,6 @@ dataset.rename(
 x_axis = "RSM voltage drop [mV]"
 y_axis = "Crack size [mm]"
 z_axis = "Real current [mA]"
-
 
 # Use deque for efficient data updates (fixed-length queue)
 max_length = 200
