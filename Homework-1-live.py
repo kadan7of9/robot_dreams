@@ -59,6 +59,7 @@ z_axis = "Real current [mA]"
 max_length = 200
 x_data = deque(maxlen=max_length)
 y_data = deque(maxlen=max_length)
+z_data = deque(maxlen=max_length)
 
 # Initialize empty figure with one scatter trace
 fig = go.Figure()
@@ -88,16 +89,27 @@ def update_graph(n):
     # Clear existing data and add 20 new points
     x_data.clear()
     y_data.clear()
+    z_data.clear()
     
     for i in range(20):
         data_index = (start_index + i) % len(dataset)
         x_data.append(dataset.iloc[data_index][x_axis])
         y_data.append(dataset.iloc[data_index][y_axis])
+        z_data.append(dataset.iloc[data_index][z_axis])
     
-    # Create new figure with updated data
+    # Create new figure with updated data and color mapping
     fig = go.Figure()
     fig.add_scatter(
-        x=list(x_data), y=list(y_data), mode="markers", name="Crackmeter Data"
+        x=list(x_data), 
+        y=list(y_data), 
+        mode="markers", 
+        name="Crackmeter Data",
+        marker=dict(
+            color=list(z_data),
+            colorscale="Viridis",
+            colorbar=dict(title="Real Current [mA]"),
+            size=8
+        )
     )
     fig.update_layout(xaxis_title="Voltage Drop [mV]", yaxis_title="Crack Size [mm]")
     return fig
