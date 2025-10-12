@@ -82,8 +82,11 @@ class WeatherApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Weather Application with World Map")
-        self.root.geometry("1200x700")  # Increased size for map
+        self.root.geometry("1200x700")
         self.root.configure(bg='#f0f0f0')
+        
+        # Handle window close event
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         
         # Initialize location variables
         self.current_lat = None
@@ -377,6 +380,12 @@ Raw data: {str(weather_data)[:200]}...
             error_info = f"Error formatting weather data: {str(e)}\n\nRaw weather data:\n{str(weather_data)[:300]}..."
             self.weather_label.config(text=error_info)
             print(f"Debug - Full weather data: {weather_data}")
+    
+    def on_closing(self):
+        """Handle the window close event"""
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.root.quit()
+            self.root.destroy()
 
 
 def main():
