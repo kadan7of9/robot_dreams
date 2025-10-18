@@ -1,4 +1,4 @@
-3# Homework-2.py
+# Homework-2.py
 # Weather Data Retrieval Script with Open-Meteo Integration
 # https://open-meteo.com/en/docs?hourly=rain&forecast_days=16
 
