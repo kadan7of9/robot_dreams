@@ -1,4 +1,4 @@
-3# Homework-2.py
+3  # Homework-2.py
 # Weather Data Retrieval Script with Open-Meteo Integration
 # https://open-meteo.com/en/docs?hourly=rain&forecast_days=16
 
@@ -15,19 +15,21 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Setup the Open-Meteo API client with cache and retry on error
-cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
-retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
-openmeteo = openmeteo_requests.Client(session = retry_session)
+cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
+retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+openmeteo = openmeteo_requests.Client(session=retry_session)
 
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     print("python-dotenv not installed. Using system environment variables only.")
 
 # Get API key from environment variable for security
 API_KEY = getenv("API_KEY")
+
 
 def get_ip():
     """Get public IP address using ipify.org API."""
@@ -42,7 +44,8 @@ def get_ip():
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         return None
-    
+
+
 def get_location(ip: str, format: str):
     """Get location information for an IP address in specified format."""
     try:
@@ -59,108 +62,116 @@ def get_location(ip: str, format: str):
     except json.JSONDecodeError as e:
         print(f"JSON parsing failed: {e}")
         return None
+
+
 def create_weather_dataframe(weather_json):
     """
     Convert Open-Meteo JSON response to a pandas DataFrame.
-    
+
     Args:
         weather_json (dict): JSON response from get_weather_data function
-        
+
     Returns:
         pandas.DataFrame: DataFrame with time as index and weather variables as columns
     """
-    if not weather_json or 'hourly' not in weather_json:
+    if not weather_json or "hourly" not in weather_json:
         print("Invalid weather data")
         return None
-    
+
     # Extract hourly data
-    hourly_data = weather_json['hourly']
-    
+    hourly_data = weather_json["hourly"]
+
     # Create DataFrame from hourly data
     df = pd.DataFrame(hourly_data)
-    
+
     # Convert time column to datetime
-    df['time'] = pd.to_datetime(df['time'])
-    
+    df["time"] = pd.to_datetime(df["time"])
+
     # Set time as index for time series analysis
-    df.set_index('time', inplace=True)
-    
+    df.set_index("time", inplace=True)
+
     # Store metadata as DataFrame attributes
-    df.attrs['elevation'] = weather_json.get('elevation', None)
-    df.attrs['latitude'] = weather_json.get('latitude', None)
-    df.attrs['longitude'] = weather_json.get('longitude', None)
-    df.attrs['timezone'] = weather_json.get('timezone', None)
-    df.attrs['generation_time_ms'] = weather_json.get('generationtime_ms', None)
-    
+    df.attrs["elevation"] = weather_json.get("elevation", None)
+    df.attrs["latitude"] = weather_json.get("latitude", None)
+    df.attrs["longitude"] = weather_json.get("longitude", None)
+    df.attrs["timezone"] = weather_json.get("timezone", None)
+    df.attrs["generation_time_ms"] = weather_json.get("generationtime_ms", None)
+
     # Store units information
-    if 'hourly_units' in weather_json:
-        df.attrs['units'] = weather_json['hourly_units']
-    
+    if "hourly_units" in weather_json:
+        df.attrs["units"] = weather_json["hourly_units"]
+
     return df
+
+
 def analyze_weather_dataframe(df):
     """
     Analyze the weather DataFrame and print statistics.
-    
+
     Args:
         df (pandas.DataFrame): Weather DataFrame
     """
     print(f"\n{'='*50}")
     print("WEATHER DATA ANALYSIS")
     print(f"{'='*50}")
-    
+
     # Basic info
     print(f"DataFrame Shape: {df.shape}")
     print(f"Date Range: {df.index.min()} to {df.index.max()}")
-    print(f"Location: {df.attrs.get('latitude', 'N/A')}°N, {df.attrs.get('longitude', 'N/A')}°E")
+    print(
+        f"Location: {df.attrs.get('latitude', 'N/A')}°N, {df.attrs.get('longitude', 'N/A')}°E"
+    )
     print(f"Elevation: {df.attrs.get('elevation', 'N/A')}m")
     print(f"Timezone: {df.attrs.get('timezone', 'N/A')}")
-    
+
     # Display first few rows
     print(f"\nFirst 10 rows:")
     print(df.head(10))
-    
+
     # Rain analysis if rain column exists
-    if 'rain' in df.columns:
+    if "rain" in df.columns:
         print(f"\nRAIN ANALYSIS:")
         print(f"Total Rain: {df['rain'].sum():.2f} mm")
         print(f"Max Hourly Rain: {df['rain'].max():.2f} mm")
         print(f"Average Rain: {df['rain'].mean():.4f} mm/hour")
         print(f"Hours with Rain: {(df['rain'] > 0).sum()}")
         print(f"Units: {df.attrs.get('units', {}).get('rain', 'N/A')}")
-        
+
         # Find rainy periods
-        rainy_hours = df[df['rain'] > 0]
+        rainy_hours = df[df["rain"] > 0]
         if not rainy_hours.empty:
             print(f"\nRainy periods:")
             for idx, row in rainy_hours.iterrows():
                 print(f"  {idx}: {row['rain']:.1f} mm")
-    
+
     # Data types and info
     print(f"\nData Types:")
     print(df.dtypes)
 
+
 def plot_weather_dataframe(df, city: str):
     """
     Create visualizations for the weather DataFrame.
-    
+
     Args:
         df (pandas.DataFrame): Weather DataFrame
         city (str): Name of the city for the plot title
     """
-    if 'rain' not in df.columns:
+    if "rain" not in df.columns:
         print("No rain data to plot")
         return
-    
+
     # Seaborn plot
     plt.figure(figsize=(12, 6))
-    sns.lineplot(data=df, x=df.index, y='rain', marker='o', markersize=4)
-    plt.title(f'Rain Forecast for {city}', fontsize=14, fontweight='bold')
-    plt.ylabel('Rain (mm)')
-    plt.xlabel('Time')
+    sns.lineplot(data=df, x=df.index, y="rain", marker="o", markersize=4)
+    plt.title(f"Rain Forecast for {city}", fontsize=14, fontweight="bold")
+    plt.ylabel("Rain (mm)")
+    plt.xlabel("Time")
     plt.xticks(rotation=45)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
+
 
 def get_real_time_weather(lat: float, lon: float):
     """Get real-time weather data for given latitude and longitude."""
@@ -189,7 +200,8 @@ def get_real_time_weather(lat: float, lon: float):
     except json.JSONDecodeError as e:
         print(f"JSON parsing failed: {e}")
         return None
-    
+
+
 def get_weather_data(lat: float, lon: float, WeatherVariable: str, forecastDays: int):
     """Fetch weather data using Open-Meteo API for given latitude and longitude."""
     url = "https://api.open-meteo.com/v1/forecast"
@@ -214,8 +226,9 @@ def get_weather_data(lat: float, lon: float, WeatherVariable: str, forecastDays:
         print(f"JSON parsing failed: {e}")
         return None
 
+
 def main():
-        # Get public IP address
+    # Get public IP address
     ip = get_ip()
     if not ip:
         print("Failed to get public IP")
@@ -226,11 +239,11 @@ def main():
     print("\nJSON:")
     location_json = json.loads(loc if loc else "{}")
     pprint(location_json)
-    location_data = location_json            
+    location_data = location_json
     # Check if the request was successful
     if location_data.get("status") != "success":
         raise Exception("Location API request failed")
-            
+
     # Extract latitude and longitude
     lat = location_data.get("lat")
     lon = location_data.get("lon")
@@ -254,33 +267,33 @@ def main():
         pprint(response)
 
     weather_df = create_weather_dataframe(response)
-        
+
     if weather_df is not None:
-            # Analyze the DataFrame
-            analyze_weather_dataframe(weather_df)
-            
-            # Create visualizations
-            plot_weather_dataframe(weather_df, city)
-            
-            # Example of additional pandas operations
-            print(f"\n{'='*50}")
-            print("ADDITIONAL PANDAS OPERATIONS")
-            print(f"{'='*50}")
-            
-            # Resample to daily data
-            daily_stats = weather_df['rain'].resample('D').agg(['sum', 'max', 'mean', 'count'])
-            print("\nDaily Rain Statistics:")
-            print(daily_stats)
-            
-            # Filter rainy hours
-            rainy_hours = weather_df[weather_df['rain'] > 0]
-            print(f"\nRainy Hours DataFrame ({len(rainy_hours)} hours):")
-            print(rainy_hours)
-            
+        # Analyze the DataFrame
+        analyze_weather_dataframe(weather_df)
+
+        # Create visualizations
+        plot_weather_dataframe(weather_df, city)
+
+        # Example of additional pandas operations
+        print(f"\n{'='*50}")
+        print("ADDITIONAL PANDAS OPERATIONS")
+        print(f"{'='*50}")
+
+        # Resample to daily data
+        daily_stats = (
+            weather_df["rain"].resample("D").agg(["sum", "max", "mean", "count"])
+        )
+        print("\nDaily Rain Statistics:")
+        print(daily_stats)
+
+        # Filter rainy hours
+        rainy_hours = weather_df[weather_df["rain"] > 0]
+        print(f"\nRainy Hours DataFrame ({len(rainy_hours)} hours):")
+        print(rainy_hours)
+
     else:
-            print("Failed to create DataFrame from weather data")
-
-
+        print("Failed to create DataFrame from weather data")
 
 
 if __name__ == "__main__":
