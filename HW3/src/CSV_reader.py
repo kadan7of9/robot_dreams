@@ -14,9 +14,7 @@ from datetime import timedelta
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-MONGO_HOST = os.getenv(
-    "MONGO_HOST", "crack_meter-db"
-)  # Default to MongoDB container name
+MONGO_HOST = os.getenv("MONGO_HOST", "localhost")  # Default to localhost if not set
 MONGO_PORT = 27017  # Default MongoDB port
 MONGO_DB = os.getenv("MONGO_DB", "crack_meter-db")  # Default to test_db if not set
 

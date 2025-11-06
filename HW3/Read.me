@@ -1,0 +1,8 @@
+csv soubor, který ma byt ulozen do databaze uložíme do adresare: src\datasets\crack_meter\CalibData-30kHz-0-12--.csv
+Aplikace Docker desktop musí byt spustena.
+Spustíme PowerShell a presuneme se do adresare, kde je umisteny soubor Dockerfile. Pouzijeme prikazy (cd.., cd Adresar, d: pro zmenu jednotky atd).
+Vice informaci lze nalest na: https://www.ninjaone.com/blog/windows-cmd-commands/ v 10 Directory navigation and management Windows CMD commands.
+Vytvorime si docker kontejner s nasi aplikaci: docker build -t crack_meter-app .
+Prikazem: docker network create -d bridge crack_meter-network vytvoříme sit mezi Docker kontejnery.
+Prikazem: docker run --network="crack_meter-network" -d -p 27017:27017 --name "crack_meter-db" mongo:latest spustíme Mongo databazi.
+Spustíme nasi aplikaci na stejne siti jako je Mongo databaze: docker run --network="crack_meter-network" -e MONGO_HOST=crack_meter-db crack_meter-app
