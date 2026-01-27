@@ -24,7 +24,7 @@ from mcculw.device_info import DaqDeviceInfo
 BOARD_NUM = 0  # Board number (default is 0)
 CHANNEL = 0  # Analog input channel (0-7 for USB-231)
 AI_RANGE = ULRange.BIP10VOLTS  # ±10V range (ONLY option for USB-231)
-SAMPLE_RATE = 100.0  # Sampling rate in Hz (max: 50,000 Hz for USB-231)
+SAMPLE_RATE = 16660.0  # Sampling rate in Hz (max: 50,000 Hz for USB-231)
 NUM_SAMPLES = 1000  # Number of samples to collect
 
 
